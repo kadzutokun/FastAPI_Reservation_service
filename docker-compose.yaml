@@ -1,0 +1,34 @@
+services:
+  fastapi:
+    build: .
+    container_name: fastapi
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: "postgresql+asyncpg://${DB_USER}:${DB_PASSWORD}@postgres:${DB_PORT}/${DB_NAME}"
+    depends_on:
+      - postgres
+    networks:
+      - fastapi_network
+
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    container_name: pgdb
+    volumes:
+      - pgdbdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - fastapi_network
+
+volumes:
+  pgdbdata:
+
+networks:
+  fastapi_network:
