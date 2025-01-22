@@ -1,4 +1,3 @@
-Евгений Кононов, [22.01.2025 20:40]
 # Booking System Backend
 
 ## Overview
