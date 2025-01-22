@@ -1,0 +1,12 @@
+[tool.poetry]
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.111.0"
+sqlalchemy = "^2.0.30"
+alembic = "^1.13.1"
+python-dotenv = "^1.0.1"
+asyncpg = "^0.29.0"
+fastapi-users = {extras = ["sqlalchemy"], version = "^13.0.0"}
+
