@@ -12,7 +12,7 @@ This project provides a backend for a booking system that enables users to book 
 ## Technology Stack
 - Backend: FastAPI
 - Messaging: Kafka
-- Database: [Specify Database, e.g., PostgreSQL]
+- Database: PostgreSQL 14
 - Frontend: Telegram Bot
 
 ## Getting Started
