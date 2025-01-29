@@ -18,12 +18,12 @@ class EventService:
         if not event:
             raise EventError(404, "Мероприятие не найдено")
 
-        # Добавляем оставшиеся места перед возвратом
-        event.remaining_seats = max(event.available_seats - event.reserved_seats, 0)
+        event.remaining_seats = await self.repository.get_event_remaining_seats(event_id)
         return EventResponse.model_validate(event)
 
     async def get_all_events(self, title: Optional[str] = None) -> List[EventResponse]:
         events = await self.repository.get_all(title)
         for event in events:
-            event.remaining_seats = max(event.available_seats - event.reserved_seats, 0)
+            event.remaining_seats = await self.repository.get_event_remaining_seats(event.id)
+
         return [EventResponse.model_validate(event) for event in events]
