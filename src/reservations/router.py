@@ -23,3 +23,8 @@ async def cancel_reservation(reservation_data:ReservationDelete , session: Async
 async def get_user_reservations(user_id: int, session: AsyncSession = Depends(get_async_session)):
     reservation_service = ReservationService(session)
     return await reservation_service.get_user_reservations(user_id)
+
+@router.get("/event/{event_id}/reservations", response_model=List[ReservationResponse])
+async def get_event_reservations(event_id: int, user_id: int, session: AsyncSession = Depends(get_async_session)):
+    reservation_service = ReservationService(session)
+    return await reservation_service.get_event_reservations(event_id, user_id)

@@ -40,3 +40,14 @@ class ReservationService:
     async def get_user_reservations(self, user_id: int) -> List[ReservationResponse]:
         reservations = await self.reservation_repository.get_by_user_id(user_id)
         return [ReservationResponse.model_validate(reservation) for reservation in reservations]
+
+    async def get_event_reservations(self, event_id: int, user_id: int) -> List[ReservationResponse]:
+        event = await self.event_repository.get_by_id(event_id)
+        if not event:
+            raise EventError(404, "Мероприятие не найдено")
+
+        if event.user_id != user_id:
+            raise EventError(403, "Вы не являетесь создателем мероприятия!")
+
+        reservations = await self.reservation_repository.get_reservations_by_event(event_id)
+        return [ReservationResponse.model_validate(reservation) for reservation in reservations]

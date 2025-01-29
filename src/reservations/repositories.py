@@ -30,6 +30,12 @@ class ReservationRepository:
         result = await self.db.execute(select(Reservation).where(Reservation.user_id == user_id))
         return result.scalars().all()
 
+    async def get_reservations_by_event(self, event_id: int):
+        result = await self.db.execute(
+            select(Reservation).where(Reservation.event_id == event_id)
+        )
+        return result.scalars().all()
+
     async def check_user_registered(self, user_id: int, event_id: int) -> bool:
         result = await self.db.execute(
             select(Reservation).where(
