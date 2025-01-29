@@ -1,10 +1,10 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from src.users.repositories import UserRepository
 from src.users.schemas import UserCreate, UserResponse
 from src.core.exceptions import UserError
 
 class UserService:
-    def __init__(self, db: Session):
+    def __init__(self, db: AsyncSession):
         self.repository = UserRepository(db)
 
     async def create_user(self, user_data: UserCreate) -> UserResponse:

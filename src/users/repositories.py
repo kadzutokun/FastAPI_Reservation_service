@@ -8,7 +8,7 @@ class UserRepository:
         self.db = db
 
     async def create(self, user_data: UserCreate) -> User:
-        user = User(telegram_id=user_data.telegram_id, nickname=user_data.nickname, password=user_data.password)
+        user = User(telegram_id=user_data.telegram_id, nickname=user_data.nickname)
         self.db.add(user)
         await self.db.commit()
         await self.db.refresh(user)
