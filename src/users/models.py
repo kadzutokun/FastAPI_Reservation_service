@@ -6,4 +6,5 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     telegram_id = Column(String, index=True)
+    nickname = Column(String, nullable=False)
     password = Column(String, nullable=False)
