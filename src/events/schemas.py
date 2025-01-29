@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional
 
+
 class EventCreate(BaseModel):
     title: str
     user_id: int
@@ -9,14 +10,26 @@ class EventCreate(BaseModel):
     date: str
     available_seats: int
 
+
 class EventResponse(BaseModel):
     id: int
     title: str
     description: str
     date: datetime
     available_seats: int
-    remaining_seats: Optional[int] = 0  # Новое поле с дефолтным значением
+    remaining_seats: Optional[int] = 0
 
+
+    model_config = {
+        'from_attributes': True
+    }
+
+
+class EventUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    date: Optional[datetime] = None
+    available_seats: Optional[int] = None
 
     model_config = {
         'from_attributes': True

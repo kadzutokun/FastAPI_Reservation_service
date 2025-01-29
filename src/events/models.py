@@ -11,5 +11,5 @@ class Event(Base):
     description = Column(String)
     date = Column(DateTime, nullable=False)
     available_seats = Column(Integer, nullable=False)
-    reservations = relationship("Reservation", back_populates="event", lazy="joined")  # Двусторонняя связь
+    reservations = relationship("Reservation", back_populates="event", lazy="joined")
 

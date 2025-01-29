@@ -6,7 +6,7 @@ from typing import Optional, List
 from sqlalchemy.sql import func
 from src.events.models import Event
 from src.reservations.models import Reservation  # Импортируем модель бронирований
-from src.events.schemas import EventCreate
+from src.events.schemas import EventCreate, EventUpdate
 from datetime import datetime
 
 class EventRepository:
@@ -17,6 +17,7 @@ class EventRepository:
         event_date = datetime.strptime(event_data.date, "%d.%m.%Y %H:%M")
         event = Event(
             title=event_data.title,
+            user_id=event_data.user_id,
             description=event_data.description,
             date=event_date,
             available_seats=event_data.available_seats
@@ -49,6 +50,18 @@ class EventRepository:
             event.reserved_seats = len(event.reservations)
 
         return events
+
+    async def update_event(self, event: Event, event_data: EventUpdate):
+        if event_data.title is not None:
+            event.title = event_data.title
+        if event_data.description is not None:
+            event.description = event_data.description
+        if event_data.available_seats is not None:
+            event.available_seats = event_data.available_seats
+        await self.db.commit()
+        await self.db.refresh(event)
+
+        return event
 
     async def get_event_remaining_seats(self, event_id: int) -> int:
         """Возвращает количество оставшихся свободных мест на мероприятие"""
