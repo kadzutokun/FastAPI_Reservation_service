@@ -10,6 +10,7 @@ services:
       DATABASE_URL: "postgresql+asyncpg://${DB_USER}:${DB_PASSWORD}@postgres:${DB_PORT}/${DB_NAME}"
     depends_on:
       - postgres
+      - kafka
     networks:
       - fastapi_network
     command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
