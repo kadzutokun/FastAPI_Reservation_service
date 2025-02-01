@@ -4,7 +4,7 @@ from src.events.schemas import EventCreate, EventResponse, EventUpdate
 from src.events.services import EventService
 from src.core.database import get_async_session
 from src.core.kafka import send_logs_kafka
-from src.core.exceptions import NotEventCreatorError, EventError, EventNotFoundError
+from src.core.exceptions import NotEventCreatorError, EventError, EventNotFoundError, InvalidSeatError
 from sqlalchemy.ext.asyncio import AsyncSession
 router = APIRouter()
 
@@ -56,6 +56,10 @@ async def update_event(
         raise EventError(status_code=status_code, detail=error_message)
     except EventNotFoundError as e:
         status_code = 404
+        error_message = str(e)
+        raise EventError(status_code=status_code, detail=error_message)
+    except InvalidSeatError as e:
+        status_code = 400
         error_message = str(e)
         raise EventError(status_code=status_code, detail=error_message)
     finally:

@@ -15,11 +15,11 @@ class UserError(HTTPException):
 
 class UserNotFoundError(Exception):
     def __init__(self):
-        super().__init__("Пользователь не найден")
+        super().__init__("Пользователь не найден!")
 
 class EventNotFoundError(Exception):
     def __init__(self):
-        super().__init__("Мероприятие не найдено")
+        super().__init__("Мероприятие не найдено!")
 
 class NotEventCreatorError(Exception):
     def __init__(self):
@@ -27,7 +27,7 @@ class NotEventCreatorError(Exception):
 
 class AlredyRegisteredOnEventError(Exception):
     def __init__(self):
-        super().__init__("Вы уже записаны на мероприятие")
+        super().__init__("Вы уже записаны на мероприятие!")
 
 class NoAvaliableSeatsError(Exception):
     def __init__(self):
@@ -37,3 +37,8 @@ class NoAvaliableSeatsError(Exception):
 class OtherReservationDeleteError(Exception):
     def __init__(self):
         super().__init__("Вы не можете удалить чужую запись!")
+
+
+class InvalidSeatError(Exception):
+    def __init__(self):
+        super().__init__("Вы не можете изменить количество мест на мероприятие, на меньшее, чем количество текущих бронирований!")
