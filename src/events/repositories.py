@@ -64,7 +64,6 @@ class EventRepository:
         return event
 
     async def get_event_remaining_seats(self, event_id: int) -> int:
-        """Возвращает количество оставшихся свободных мест на мероприятие"""
         result = await self.db.execute(
             select(func.count()).where(Reservation.event_id == event_id)
         )
@@ -74,8 +73,5 @@ class EventRepository:
             select(Event.available_seats).where(Event.id == event_id)
         )
         available_seats = event.scalar()
-
-        if available_seats is None:
-            raise ValueError("Мероприятие не найдено")
 
         return max(available_seats - reserved_seats, 0)
