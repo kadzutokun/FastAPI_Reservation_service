@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, conint
 from datetime import datetime
 from typing import Optional
 
@@ -30,7 +30,7 @@ class EventUpdate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
     date: Optional[datetime] = None
-    available_seats: Optional[int] = None
+    available_seats: Optional[conint(ge=0)] = None
 
     model_config = {
         'from_attributes': True
