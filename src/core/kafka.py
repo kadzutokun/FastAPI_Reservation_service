@@ -1,8 +1,14 @@
 import json
+import os
+from dotenv import load_dotenv
 from aiokafka import AIOKafkaProducer
-from datetime import datetime
 
-KAFKA_BOOTSTRAP_SERVERS = "kafka:9092"
+
+load_dotenv()
+
+
+KAFKA_BOOTSTRAP_SERVERS = os.environ.get("KAFKA_BOOTSTRAP_SERVERS")
+
 
 class KafkaProducer:
     def __init__(self):
