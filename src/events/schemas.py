@@ -13,6 +13,7 @@ class EventCreate(BaseModel):
 
 class EventResponse(BaseModel):
     id: int
+    user_id: int
     title: str
     description: str
     date: datetime
