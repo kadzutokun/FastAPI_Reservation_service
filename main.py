@@ -17,6 +17,7 @@ async def lifespan(app):
 
     await kafka_producer.stop()
 
+
 app = FastAPI(lifespan=lifespan, title="Bookings reservation App")
 
 app.add_middleware(
@@ -31,7 +32,6 @@ app.add_middleware(TransactionMiddleware)
 app.include_router(reservations_router, prefix="/reservations", tags=["Reservations"])
 app.include_router(users_router, prefix="/users", tags=["Users"])
 app.include_router(events_router, prefix="/events", tags=["Events"])
-
 
 
 if __name__ == "__main__":

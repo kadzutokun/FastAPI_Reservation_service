@@ -20,10 +20,7 @@ class EventResponse(BaseModel):
     available_seats: int
     remaining_seats: Optional[int] = 0
 
-
-    model_config = {
-        'from_attributes': True
-    }
+    model_config = {"from_attributes": True}
 
 
 class EventUpdate(BaseModel):
@@ -32,6 +29,4 @@ class EventUpdate(BaseModel):
     date: Optional[datetime] = None
     available_seats: Optional[conint(ge=0)] = None
 
-    model_config = {
-        'from_attributes': True
-    }
+    model_config = {"from_attributes": True}

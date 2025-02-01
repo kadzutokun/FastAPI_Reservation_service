@@ -3,6 +3,7 @@ from src.users.repositories import UserRepository
 from src.users.schemas import UserCreate, UserResponse
 from src.core.exceptions import UserNotFoundError
 
+
 class UserService:
     def __init__(self, db: AsyncSession):
         self.repository = UserRepository(db)

@@ -3,7 +3,14 @@ from typing import List
 from src.reservations.repositories import ReservationRepository
 from src.events.repositories import EventRepository
 from src.reservations.schemas import ReservationCreate, ReservationResponse, ReservationDelete
-from src.core.exceptions import ReservationError, EventNotFoundError, AlredyRegisteredOnEventError, NotEventCreatorError, NoAvaliableSeatsError, OtherReservationDeleteError
+from src.core.exceptions import (
+    EventNotFoundError,
+    AlredyRegisteredOnEventError,
+    NotEventCreatorError,
+    NoAvaliableSeatsError,
+    OtherReservationDeleteError,
+)
+
 
 class ReservationService:
     def __init__(self, db: AsyncSession):

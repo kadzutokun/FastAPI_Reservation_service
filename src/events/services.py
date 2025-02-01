@@ -1,10 +1,10 @@
-# src/events/services.py
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from src.events.repositories import EventRepository
 from src.events.schemas import EventCreate, EventResponse, EventUpdate
 from src.reservations.repositories import ReservationRepository
 from src.core.exceptions import EventNotFoundError, NotEventCreatorError, InvalidSeatError
+
 
 class EventService:
     def __init__(self, db: Session):

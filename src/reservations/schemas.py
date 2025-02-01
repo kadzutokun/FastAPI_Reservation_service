@@ -11,9 +11,7 @@ class ReservationResponse(BaseModel):
     user_id: int
     event_id: int
 
-    model_config = {
-        'from_attributes': True
-    }
+    model_config = {"from_attributes": True}
 
 
 class ReservationDelete(BaseModel):

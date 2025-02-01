@@ -26,14 +26,12 @@ class KafkaProducer:
     async def stop(self):
         await self.producer.stop()
 
+
 kafka_producer = KafkaProducer()
 
-async def send_logs_kafka(topic: str, action: str, status_code:int ,details):
+
+async def send_logs_kafka(topic: str, action: str, status_code: int, details):
     details_serializable = json.loads(json.dumps(details, default=str))
 
-    message = {
-        "action": action,
-        "status_code": status_code,
-        "details": details_serializable
-    }
+    message = {"action": action, "status_code": status_code, "details": details_serializable}
     await kafka_producer.send(topic, message)

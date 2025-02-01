@@ -3,6 +3,7 @@ from sqlalchemy.future import select
 from src.users.models import User
 from src.users.schemas import UserCreate
 
+
 class UserRepository:
     def __init__(self, db: AsyncSession):
         self.db = db

@@ -3,15 +3,22 @@ from typing import List
 from src.reservations.schemas import ReservationCreate, ReservationResponse, ReservationDelete
 from src.reservations.services import ReservationService
 from src.core.database import get_async_session
-from src.core.exceptions import ReservationError, AlredyRegisteredOnEventError, EventNotFoundError, NoAvaliableSeatsError, OtherReservationDeleteError, NotEventCreatorError
+from src.core.exceptions import (
+    ReservationError,
+    AlredyRegisteredOnEventError,
+    EventNotFoundError,
+    NoAvaliableSeatsError,
+    OtherReservationDeleteError,
+    NotEventCreatorError,
+)
 from src.core.kafka import send_logs_kafka
 from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter()
 
+
 @router.post("/", response_model=ReservationResponse)
-async def reservation(reservation_data: ReservationCreate,
-                       session: AsyncSession = Depends(get_async_session)):
+async def reservation(reservation_data: ReservationCreate, session: AsyncSession = Depends(get_async_session)):
     reservation = {}
     error_message = {}
     try:
@@ -30,8 +37,9 @@ async def reservation(reservation_data: ReservationCreate,
         details = reservation.model_dump() if reservation else {"error_message": error_message}
         await send_logs_kafka("reservations-logs", "reservation_create", status_code, details=details)
 
+
 @router.delete("/{reservation_id}")
-async def cancel_reservation(reservation_data:ReservationDelete , session: AsyncSession = Depends(get_async_session)):
+async def cancel_reservation(reservation_data: ReservationDelete, session: AsyncSession = Depends(get_async_session)):
     error_message = {}
     try:
         reservation_service = ReservationService(session)
@@ -46,6 +54,7 @@ async def cancel_reservation(reservation_data:ReservationDelete , session: Async
         details = reservation_data.model_dump() if reservation else {"error_message": error_message}
         await send_logs_kafka("reservations-logs", "reservation_cancel", status_code, details=details)
 
+
 @router.get("/user/{user_id}", response_model=List[ReservationResponse])
 async def get_user_reservations(user_id: int, session: AsyncSession = Depends(get_async_session)):
     try:
@@ -55,6 +64,7 @@ async def get_user_reservations(user_id: int, session: AsyncSession = Depends(ge
         return reservations
     finally:
         await send_logs_kafka("reservations-logs", "reservation_get_user", status_code, details=reservations)
+
 
 @router.get("/event/{event_id}/reservations", response_model=List[ReservationResponse])
 async def get_event_reservations(event_id: int, user_id: int, session: AsyncSession = Depends(get_async_session)):

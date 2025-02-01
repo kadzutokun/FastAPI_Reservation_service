@@ -6,13 +6,14 @@ from src.core.database import get_async_session
 from src.core.kafka import send_logs_kafka
 from src.core.exceptions import NotEventCreatorError, EventError, EventNotFoundError, InvalidSeatError
 from sqlalchemy.ext.asyncio import AsyncSession
+
 router = APIRouter()
 
 
 @router.get("/", response_model=List[EventResponse])
 async def get_all_events(
     title: Optional[str] = Query(None, description="Поиск по названию мероприятия"),
-    session: AsyncSession = Depends(get_async_session)
+    session: AsyncSession = Depends(get_async_session),
 ):
     try:
         event_service = EventService(session)
@@ -21,6 +22,7 @@ async def get_all_events(
         return events
     finally:
         await send_logs_kafka("events-logs", "event_get_all", status_code, details=events)
+
 
 @router.post("/create", response_model=EventResponse)
 async def create_event(event_data: EventCreate, session: AsyncSession = Depends(get_async_session)):
@@ -36,12 +38,10 @@ async def create_event(event_data: EventCreate, session: AsyncSession = Depends(
         details = event.model_dump() if event else {}
         await send_logs_kafka("events-logs", "event_create", status_code, details=details)
 
+
 @router.patch("/{event_id}", response_model=EventResponse)
 async def update_event(
-    event_id: int,
-    user_id: int,
-    event_data: EventUpdate,
-    session: AsyncSession = Depends(get_async_session)
+    event_id: int, user_id: int, event_data: EventUpdate, session: AsyncSession = Depends(get_async_session)
 ):
     updated_event = {}
     error_message = {}
@@ -66,6 +66,7 @@ async def update_event(
         details = updated_event.model_dump() if updated_event else {"error_message": error_message}
         await send_logs_kafka("events-logs", "event_update", status_code, details=details)
 
+
 @router.get("/{event_id}", response_model=EventResponse)
 async def get_event(event_id: int, session: AsyncSession = Depends(get_async_session)):
     error_message = {}
@@ -76,7 +77,7 @@ async def get_event(event_id: int, session: AsyncSession = Depends(get_async_ses
         status_code = 200
         return event
     except EventNotFoundError as e:
-        status_code=404
+        status_code = 404
         error_message = str(e)
         raise EventError(status_code=status_code, detail=error_message)
     finally:
