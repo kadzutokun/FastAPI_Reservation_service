@@ -9,6 +9,7 @@ from src.core.exceptions import (
     NotEventCreatorError,
     NoAvaliableSeatsError,
     OtherReservationDeleteError,
+    ReservationNotFoundError,
 )
 
 
@@ -37,11 +38,16 @@ class ReservationService:
         return ReservationResponse.model_validate(reservation)
 
     async def cancel_reservation(self, reservation_data: ReservationDelete):
+        is_reservation_exist = await self.reservation_repository.get_by_user_id(reservation_data.user_id)
+        if not is_reservation_exist:
+            raise ReservationNotFoundError
+        print(is_reservation_exist)
         is_can_delete_reservation = await self.reservation_repository.check_access_to_delete_reservation(
             reservation_data.user_id, reservation_data.event_id
         )
         if not is_can_delete_reservation:
             raise OtherReservationDeleteError
+
         await self.reservation_repository.delete(reservation_data)
 
     async def get_user_reservations(self, user_id: int) -> List[ReservationResponse]:

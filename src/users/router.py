@@ -3,19 +3,20 @@ from src.users.schemas import UserCreate, UserResponse
 from src.users.services import UserService
 from src.core.database import get_async_session
 from src.core.exceptions import UserNotFoundError, UserError
+from src.core.schemas import APIResponse
 from src.core.kafka import send_logs_kafka
 from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter()
 
 
-@router.post("/register", response_model=UserResponse)
+@router.post("/register", response_model=APIResponse[UserResponse])
 async def register_user(user_data: UserCreate, session: AsyncSession = Depends(get_async_session)):
     user_service = UserService(session)
-    return {"data": await user_service.create_user(user_data)}
+    return APIResponse(data=await user_service.create_user(user_data))
 
 
-@router.get("/{user_id}", response_model=UserResponse)
+@router.get("/{user_id}", response_model=APIResponse[UserResponse])
 async def get_user(user_id: int, session: AsyncSession = Depends(get_async_session)):
     user = {}
     error_message = {}
@@ -23,7 +24,7 @@ async def get_user(user_id: int, session: AsyncSession = Depends(get_async_sessi
         user_service = UserService(session)
         user = await user_service.get_user(user_id)
         status_code = 200
-        return {"data": user}
+        return APIResponse(data=user)
     except UserNotFoundError as e:
         status_code = 404
         error_message = str(e)

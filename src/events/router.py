@@ -3,6 +3,7 @@ from typing import List, Optional
 from src.events.schemas import EventCreate, EventResponse, EventUpdate
 from src.events.services import EventService
 from src.core.database import get_async_session
+from src.core.schemas import APIResponse
 from src.core.kafka import send_logs_kafka
 from src.core.exceptions import NotEventCreatorError, EventError, EventNotFoundError, InvalidSeatError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 router = APIRouter()
 
 
-@router.get("/", response_model=List[EventResponse])
+@router.get("/", response_model=APIResponse[List[EventResponse]])
 async def get_all_events(
     title: Optional[str] = Query(None, description="Поиск по названию мероприятия"),
     session: AsyncSession = Depends(get_async_session),
@@ -19,18 +20,18 @@ async def get_all_events(
         event_service = EventService(session)
         events = await event_service.get_all_events(title=title)
         status_code = 200
-        return {"data": events}
+        return APIResponse(data=events)
     finally:
         await send_logs_kafka("events-logs", "event_get_all", status_code, details=events)
 
 
-@router.post("/create", response_model=EventResponse)
+@router.post("/create", response_model=APIResponse[EventResponse])
 async def create_event(event_data: EventCreate, session: AsyncSession = Depends(get_async_session)):
     try:
         event_service = EventService(session)
         event = await event_service.create_event(event_data)
         status_code = 201
-        return {"data": event}
+        return APIResponse(data=event)
     except Exception as e:
         status_code = 500
         raise EventError(status_code=status_code, data=str(e))
@@ -39,7 +40,7 @@ async def create_event(event_data: EventCreate, session: AsyncSession = Depends(
         await send_logs_kafka("events-logs", "event_create", status_code, details=details)
 
 
-@router.patch("/{event_id}", response_model=EventResponse)
+@router.patch("/{event_id}", response_model=APIResponse[EventResponse])
 async def update_event(
     event_id: int, user_id: int, event_data: EventUpdate, session: AsyncSession = Depends(get_async_session)
 ):
@@ -49,7 +50,7 @@ async def update_event(
         event_service = EventService(session)
         updated_event = await event_service.update_event(event_id, user_id, event_data)
         status_code = 200
-        return {"data": updated_event}
+        return APIResponse(data=updated_event)
     except NotEventCreatorError as e:
         status_code = 403
         error_message = str(e)
@@ -67,7 +68,7 @@ async def update_event(
         await send_logs_kafka("events-logs", "event_update", status_code, details=details)
 
 
-@router.get("/{event_id}", response_model=EventResponse)
+@router.get("/{event_id}", response_model=APIResponse[EventResponse])
 async def get_event(event_id: int, session: AsyncSession = Depends(get_async_session)):
     error_message = {}
     event = {}
@@ -75,7 +76,7 @@ async def get_event(event_id: int, session: AsyncSession = Depends(get_async_ses
         event_service = EventService(session)
         event = await event_service.get_event(event_id)
         status_code = 200
-        return {"data": event}
+        return APIResponse(data=event)
     except EventNotFoundError as e:
         status_code = 404
         error_message = str(e)
