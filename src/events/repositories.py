@@ -9,6 +9,7 @@ from src.reservations.models import Reservation  # Импортируем мод
 from src.events.schemas import EventCreate, EventUpdate
 from datetime import datetime
 
+
 class EventRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
@@ -20,7 +21,7 @@ class EventRepository:
             user_id=event_data.user_id,
             description=event_data.description,
             date=event_date,
-            available_seats=event_data.available_seats
+            available_seats=event_data.available_seats,
         )
         self.db.add(event)
         await self.db.commit()
@@ -29,9 +30,7 @@ class EventRepository:
 
     async def get_by_id(self, event_id: int) -> Optional[Event]:
         result = await self.db.execute(
-            select(Event)
-            .where(Event.id == event_id)
-            .options(joinedload(Event.reservations))
+            select(Event).where(Event.id == event_id).options(joinedload(Event.reservations))
         )
         event = result.unique().scalars().first()
         if event:
@@ -64,18 +63,10 @@ class EventRepository:
         return event
 
     async def get_event_remaining_seats(self, event_id: int) -> int:
-        """Возвращает количество оставшихся свободных мест на мероприятие"""
-        result = await self.db.execute(
-            select(func.count()).where(Reservation.event_id == event_id)
-        )
+        result = await self.db.execute(select(func.count()).where(Reservation.event_id == event_id))
         reserved_seats = result.scalar() or 0
 
-        event = await self.db.execute(
-            select(Event.available_seats).where(Event.id == event_id)
-        )
+        event = await self.db.execute(select(Event.available_seats).where(Event.id == event_id))
         available_seats = event.scalar()
-
-        if available_seats is None:
-            raise ValueError("Мероприятие не найдено")
 
         return max(available_seats - reserved_seats, 0)

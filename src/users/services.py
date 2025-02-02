@@ -1,7 +1,8 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.users.repositories import UserRepository
 from src.users.schemas import UserCreate, UserResponse
-from src.core.exceptions import UserError
+from src.core.exceptions import UserNotFoundError
+
 
 class UserService:
     def __init__(self, db: AsyncSession):
@@ -14,5 +15,5 @@ class UserService:
     async def get_user(self, user_id: int) -> UserResponse:
         user = await self.repository.get_by_id(user_id)
         if not user:
-            raise UserError(404, "Пользователь не найден")
+            raise UserNotFoundError
         return UserResponse.model_validate(user)

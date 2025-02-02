@@ -1,12 +1,24 @@
 import uvicorn
 from fastapi import FastAPI
+from contextlib import asynccontextmanager
 from src.reservations.router import router as reservations_router
 from src.users.router import router as users_router
 from src.events.router import router as events_router
 from fastapi.middleware.cors import CORSMiddleware
 from src.core.transaction_middleware import TransactionMiddleware
+from src.core.kafka import kafka_producer
 
-app = FastAPI(title="Bookings reservation App")
+
+@asynccontextmanager
+async def lifespan(app):
+    await kafka_producer.start()
+
+    yield
+
+    await kafka_producer.stop()
+
+
+app = FastAPI(lifespan=lifespan, title="Bookings reservation App")
 
 app.add_middleware(
     CORSMiddleware,
@@ -17,10 +29,10 @@ app.add_middleware(
 )
 
 app.add_middleware(TransactionMiddleware)
-
 app.include_router(reservations_router, prefix="/reservations", tags=["Reservations"])
 app.include_router(users_router, prefix="/users", tags=["Users"])
 app.include_router(events_router, prefix="/events", tags=["Events"])
+
 
 if __name__ == "__main__":
     uvicorn.run(

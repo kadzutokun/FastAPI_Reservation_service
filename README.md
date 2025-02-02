@@ -29,9 +29,10 @@ This project provides a backend for a booking system that enables users to book 
    git clone https://github.com/kadzutokun/FastAPI_Reservation_service.git
 
 2. Build and start services using Docker Compose:
+   ```
    docker-compose up --build
-3. Configure environment variables in .env file.
-4. Use the Makefile for common tasks, such as:
+4. Configure environment variables in .env file.
+5. Use the Makefile for common tasks, such as:
 Use the Makefile for common tasks, such as:
 Run tests:
 ```
