@@ -25,14 +25,14 @@ async def reservation(reservation_data: ReservationCreate, session: AsyncSession
         reservation_service = ReservationService(session)
         reservation = await reservation_service.create_reservation(reservation_data)
         status_code = 201
-        return reservation
+        return {"data": reservation}
     except (AlredyRegisteredOnEventError, NoAvaliableSeatsError) as e:
         status_code = 400
-        raise ReservationError(status_code=status_code, detail=str(e))
+        raise ReservationError(status_code=status_code, data=str(e))
     except EventNotFoundError as e:
         status_code = 404
         error_message = str(e)
-        raise ReservationError(status_code=status_code, detail=error_message)
+        raise ReservationError(status_code=status_code, data=error_message)
     finally:
         details = reservation.model_dump() if reservation else {"error_message": error_message}
         await send_logs_kafka("reservations-logs", "reservation_create", status_code, details=details)
@@ -45,11 +45,11 @@ async def cancel_reservation(reservation_data: ReservationDelete, session: Async
         reservation_service = ReservationService(session)
         reservation = reservation_service.cancel_reservation(reservation_data)
         status_code = 204
-        return {"status_code": status_code, "detail": "Бронирование отменено"}
+        return {"data": "Бронирование отменено"}
     except OtherReservationDeleteError as e:
         status_code = 403
         error_message = str(e)
-        raise ReservationError(status_code=status_code, detail=error_message)
+        raise ReservationError(status_code=status_code, data=error_message)
     finally:
         details = reservation_data.model_dump() if reservation else {"error_message": error_message}
         await send_logs_kafka("reservations-logs", "reservation_cancel", status_code, details=details)
@@ -61,7 +61,7 @@ async def get_user_reservations(user_id: int, session: AsyncSession = Depends(ge
         reservation_service = ReservationService(session)
         reservations = await reservation_service.get_user_reservations(user_id)
         status_code = 200
-        return reservations
+        return {"data": reservations}
     finally:
         await send_logs_kafka("reservations-logs", "reservation_get_user", status_code, details=reservations)
 
@@ -74,15 +74,15 @@ async def get_event_reservations(event_id: int, user_id: int, session: AsyncSess
         reservation_service = ReservationService(session)
         reservations = await reservation_service.get_event_reservations(event_id, user_id)
         status_code = 200
-        return reservations
+        return {"data": reservations}
     except NotEventCreatorError as e:
         status_code = 403
         error_message = str(e)
-        raise ReservationError(status_code=status_code, detail=error_message)
+        raise ReservationError(status_code=status_code, data=error_message)
     except EventNotFoundError as e:
         status_code = 404
         error_message = str(e)
-        raise ReservationError(status_code=status_code, detail=error_message)
+        raise ReservationError(status_code=status_code, data=error_message)
     finally:
         details = reservations if reservations else {"error_message": error_message}
         await send_logs_kafka("reservations-logs", "reservation_get_event", status_code, details=details)

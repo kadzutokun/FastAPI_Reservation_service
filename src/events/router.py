@@ -19,7 +19,7 @@ async def get_all_events(
         event_service = EventService(session)
         events = await event_service.get_all_events(title=title)
         status_code = 200
-        return events
+        return {"data": events}
     finally:
         await send_logs_kafka("events-logs", "event_get_all", status_code, details=events)
 
@@ -30,10 +30,10 @@ async def create_event(event_data: EventCreate, session: AsyncSession = Depends(
         event_service = EventService(session)
         event = await event_service.create_event(event_data)
         status_code = 201
-        return event
+        return {"data": event}
     except Exception as e:
         status_code = 500
-        raise EventError(status_code=status_code, detail=str(e))
+        raise EventError(status_code=status_code, data=str(e))
     finally:
         details = event.model_dump() if event else {}
         await send_logs_kafka("events-logs", "event_create", status_code, details=details)
@@ -49,19 +49,19 @@ async def update_event(
         event_service = EventService(session)
         updated_event = await event_service.update_event(event_id, user_id, event_data)
         status_code = 200
-        return updated_event
+        return {"data": updated_event}
     except NotEventCreatorError as e:
         status_code = 403
         error_message = str(e)
-        raise EventError(status_code=status_code, detail=error_message)
+        raise EventError(status_code=status_code, data=error_message)
     except EventNotFoundError as e:
         status_code = 404
         error_message = str(e)
-        raise EventError(status_code=status_code, detail=error_message)
+        raise EventError(status_code=status_code, data=error_message)
     except InvalidSeatError as e:
         status_code = 400
         error_message = str(e)
-        raise EventError(status_code=status_code, detail=error_message)
+        raise EventError(status_code=status_code, data=error_message)
     finally:
         details = updated_event.model_dump() if updated_event else {"error_message": error_message}
         await send_logs_kafka("events-logs", "event_update", status_code, details=details)
@@ -75,11 +75,11 @@ async def get_event(event_id: int, session: AsyncSession = Depends(get_async_ses
         event_service = EventService(session)
         event = await event_service.get_event(event_id)
         status_code = 200
-        return event
+        return {"data": event}
     except EventNotFoundError as e:
         status_code = 404
         error_message = str(e)
-        raise EventError(status_code=status_code, detail=error_message)
+        raise EventError(status_code=status_code, data=error_message)
     finally:
         details = event.model_dump() if event else {"error_message": error_message}
         await send_logs_kafka("events-logs", "event_get", status_code, details=details)
