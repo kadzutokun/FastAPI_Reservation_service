@@ -12,8 +12,15 @@ router = APIRouter()
 
 @router.post("/register", response_model=APIResponse[UserResponse])
 async def register_user(user_data: UserCreate, session: AsyncSession = Depends(get_async_session)):
-    user_service = UserService(session)
-    return APIResponse(data=await user_service.create_user(user_data))
+    try:
+        user_service = UserService(session)
+        new_user = await user_service.create_user(user_data)
+        status_code = 200
+        return APIResponse(data=new_user)
+    finally:
+        details = new_user.model_dump() if new_user else {}
+        await send_logs_kafka("users-logs", "user_get", status_code, details=details)
+
 
 
 @router.get("/{user_id}", response_model=APIResponse[UserResponse])
