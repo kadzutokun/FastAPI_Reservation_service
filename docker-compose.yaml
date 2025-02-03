@@ -21,9 +21,8 @@ services:
     volumes:
       - .:/app
     environment:
-      DATABASE_URL: "postgresql+asyncpg://${DB_USER}:${DB_PASSWORD}@postgres:${DB_PORT}/${DB_NAME}"
-      API_BASE_URL: "http://fastapi:8000"
-      TELEGRAM_TOKEN: "${TELEGRAM_TOKEN}"
+      API_LINK: "http://0.0.0.0:8000"
+      TOKEN: "${TELEGRAM_TOKEN}"
     depends_on:
       - fastapi
     networks:
