@@ -2,13 +2,8 @@ import logging
 import asyncio
 from aiogram import Bot, Dispatcher
 from aiogram.filters import CommandStart, Command
-from telegram_bot.bot_config import TOKEN
-from telegram_bot.handlers import (
-    common,
-    events,
-    reservations,
-    users
-)
+from bot_config import TOKEN
+from handlers import common, events, reservations, users
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -37,6 +32,7 @@ def register_handlers():
 async def main():
     register_handlers()
     await dp.start_polling(bot)
+
 
 if __name__ == "__main__":
     try:

@@ -4,8 +4,8 @@ from aiogram import types
 from aiogram.filters import Command
 from aiogram.types import Message
 from aiohttp import ClientSession
-from telegram_bot.bot_config import API_LINK
-from telegram_bot.services.api_client import handle_api_response
+from bot_config import API_LINK
+from services.api_client import handle_api_response
 
 
 async def cmd_create_event(message: Message):
@@ -30,14 +30,14 @@ async def cmd_create_event(message: Message):
                     "description": description,
                     "date": date,
                     "available_seats": seats,
-                    "user_id": message.from_user.id
-                }
+                    "user_id": message.from_user.id,
+                },
             )
             return await handle_api_response(
                 response,
                 message,
                 success_msg=f"✅ Мероприятие '{title}' успешно создано!",
-                error_prefix="Создание мероприятия"
+                error_prefix="Создание мероприятия",
             )
     except ValueError:
         await message.reply(
@@ -61,19 +61,19 @@ async def cmd_update_event(message: Message):
 
         # Парсинг параметров обновления
         for param in args[1:]:
-            if '=' in param:
-                key, value = param.split('=', 1)
+            if "=" in param:
+                key, value = param.split("=", 1)
                 key = key.strip().lower()
 
-                if key == 'seats':
-                    update_data['available_seats'] = int(value)
-                elif key == 'title':
-                    update_data['title'] = value
-                elif key == 'description':
-                    update_data['description'] = value
-                elif key == 'date':
+                if key == "seats":
+                    update_data["available_seats"] = int(value)
+                elif key == "title":
+                    update_data["title"] = value
+                elif key == "description":
+                    update_data["description"] = value
+                elif key == "date":
                     datetime.strptime(value, "%Y-%m-%d")
-                    update_data['date'] = value
+                    update_data["date"] = value
 
         if not update_data:
             raise ValueError("Нет параметров для обновления")
@@ -81,11 +81,7 @@ async def cmd_update_event(message: Message):
         async with ClientSession() as session:
             response = await session.patch(
                 f"http://{API_LINK}:8000/events/{event_id}",
-                json={
-                    "user_id": message.from_user.id,
-                    "event_id": event_id,
-                    **update_data
-                }
+                json={"user_id": message.from_user.id, "event_id": event_id, **update_data},
             )
             return await handle_api_response(
                 response,
@@ -98,7 +94,7 @@ async def cmd_update_event(message: Message):
                     f"Дата: {data['data']['date']}\n"
                     f"Мест: {data['data']['available_seats']}"
                 ),
-                error_prefix="Обновление мероприятия"
+                error_prefix="Обновление мероприятия",
             )
 
     except ValueError as e:
@@ -121,9 +117,7 @@ async def cmd_get_event(message: Message):
     try:
         event_id = int(message.text.split()[1])
         async with ClientSession() as session:
-            response = await session.get(
-                f"http://{API_LINK}:8000/events/{event_id}",
-                params={"event_id": event_id})
+            response = await session.get(f"http://{API_LINK}:8000/events/{event_id}", params={"event_id": event_id})
             return await handle_api_response(
                 response,
                 message,
@@ -134,7 +128,7 @@ async def cmd_get_event(message: Message):
                     f"Свободных мест: {data['data']['available_seats']}\n"
                     f"ID: {data['data']['id']}"
                 ),
-                error_prefix="Получение информации о мероприятии"
+                error_prefix="Получение информации о мероприятии",
             )
     except (IndexError, ValueError):
         await message.reply("ℹ️ Формат команды: /event <ID_мероприятия>")
@@ -144,15 +138,12 @@ async def cmd_search_events(message: Message):
     try:
         search_query = message.text.split()[1]
         async with ClientSession() as session:
-            response = await session.get(
-                f"http://{API_LINK}:8000/events/",
-                params={"title": search_query}
-            )
+            response = await session.get(f"http://{API_LINK}:8000/events/", params={"title": search_query})
             return await handle_api_response(
                 response,
                 message,
-                success_handler=lambda data: format_events_list(data['data']),
-                error_prefix="Поиск мероприятий"
+                success_handler=lambda data: format_events_list(data["data"]),
+                error_prefix="Поиск мероприятий",
             )
     except IndexError:
         await message.reply("ℹ️ Укажите поисковый запрос: /search_event <название>")

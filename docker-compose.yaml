@@ -11,6 +11,7 @@ services:
     depends_on:
       - postgres
       - kafka
+      - kafka-ui
     networks:
       - fastapi_network
     command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
@@ -21,7 +22,7 @@ services:
     volumes:
       - .:/app
     environment:
-      API_LINK: "http://0.0.0.0:8000"
+      API_LINK: "http://127.0.0.1:8000"
       TOKEN: "${TELEGRAM_TOKEN}"
     depends_on:
       - fastapi
