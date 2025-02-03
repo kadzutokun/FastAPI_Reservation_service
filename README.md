@@ -34,13 +34,13 @@ This project provides a backend for a booking system that enables users to book 
 4. Configure environment variables in .env file.
 5. Use the Makefile for common tasks, such as:
 Use the Makefile for common tasks, such as:
-Run tests:
-```
-make test
-```
 Start development server:
 ```   
 make run
+```
+Start migrations:
+```
+make migrate
 ```
 API Documentation
 Visit /docs for interactive API documentation powered by Swagger.
