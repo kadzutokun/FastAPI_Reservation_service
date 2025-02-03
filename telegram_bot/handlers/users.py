@@ -25,9 +25,8 @@ async def cmd_register(message: Message):
                 success_handler=lambda data: (
                     f"✅ Регистрация успешна!\n\n"
                     f"Ваш профиль:\n"
-                    f"ID: {data['data']['id']}\n"
-                    f"Никнейм: {data['data']['nickname']}\n"
-                    f"Telegram ID: {data['data']['telegram_id']}"
+                    f"Никнейм: {data['nickname']}\n"
+                    f"Telegram ID: {data['telegram_id']}"
                 ),
                 error_prefix="Регистрация",
             )
