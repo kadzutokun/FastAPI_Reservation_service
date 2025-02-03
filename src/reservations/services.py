@@ -4,12 +4,12 @@ from src.reservations.repositories import ReservationRepository
 from src.events.repositories import EventRepository
 from src.reservations.schemas import ReservationCreate, ReservationResponse, ReservationDelete
 from src.core.exceptions import (
-    EventNotFoundError,
-    AlredyRegisteredOnEventError,
-    NotEventCreatorError,
-    NoAvaliableSeatsError,
-    OtherReservationDeleteError,
-    ReservationNotFoundError,
+    EventNotFoundException,
+    AlredyRegisteredOnEventException,
+    NotEventCreatorException,
+    NoAvaliableSeatsException,
+    OtherReservationDeleteException,
+    ReservationNotFoundException,
 )
 
 
@@ -24,15 +24,15 @@ class ReservationService:
         )
 
         if is_registered:
-            raise AlredyRegisteredOnEventError
+            raise AlredyRegisteredOnEventException
 
         event = await self.event_repository.get_by_id(reservation_data.event_id)
         if not event:
-            raise EventNotFoundError
+            raise EventNotFoundException
 
         reserved_seats = await self.event_repository.get_event_remaining_seats(reservation_data.event_id)
         if reserved_seats <= 0:
-            raise NoAvaliableSeatsError
+            raise NoAvaliableSeatsException
 
         reservation = await self.reservation_repository.create(reservation_data)
         return ReservationResponse.model_validate(reservation)
@@ -40,13 +40,13 @@ class ReservationService:
     async def cancel_reservation(self, reservation_data: ReservationDelete):
         is_reservation_exist = await self.reservation_repository.get_by_user_id(reservation_data.user_id)
         if not is_reservation_exist:
-            raise ReservationNotFoundError
+            raise ReservationNotFoundException
         print(is_reservation_exist)
         is_can_delete_reservation = await self.reservation_repository.check_access_to_delete_reservation(
             reservation_data.user_id, reservation_data.event_id
         )
         if not is_can_delete_reservation:
-            raise OtherReservationDeleteError
+            raise OtherReservationDeleteException
 
         await self.reservation_repository.delete(reservation_data)
 
@@ -57,10 +57,10 @@ class ReservationService:
     async def get_event_reservations(self, event_id: int, user_id: int) -> List[ReservationResponse]:
         event = await self.event_repository.get_by_id(event_id)
         if not event:
-            raise EventNotFoundError
+            raise EventNotFoundException
 
         if event.user_id != user_id:
-            raise NotEventCreatorError
+            raise NotEventCreatorException
 
         reservations = await self.reservation_repository.get_reservations_by_event(event_id)
         return [ReservationResponse.model_validate(reservation) for reservation in reservations]
