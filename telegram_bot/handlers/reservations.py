@@ -13,7 +13,7 @@ async def cmd_book(message: Message):
 
         async with aiohttp.ClientSession() as session:
             async with session.post(
-                    f"{API_LINK}/reservation/",
+                    f"{API_LINK}:8000/reservation/",
                     json={"user_id": user_id, "event_id": event_id}
             ) as response:
                 data = await response.json()
@@ -35,7 +35,7 @@ async def cmd_my_reservations(message: Message):
     user_id = message.from_user.id
 
     async with aiohttp.ClientSession() as session:
-        async with session.get(f"{API_LINK}/reservation/user/{user_id}") as response:
+        async with session.get(f"{API_LINK}:8000/reservation/user/{user_id}") as response:
             data = await response.json()
 
             if response.status == 200:
@@ -60,7 +60,7 @@ async def cmd_cancel(message: Message):
 
         async with aiohttp.ClientSession() as session:
             async with session.delete(
-                    f"{API_LINK}/reservation/{reservation_id}",
+                    f"{API_LINK}:8000/reservation/{reservation_id}",
                     json={"user_id": user_id}
             ) as response:
                 if response.status == 204:
@@ -83,7 +83,7 @@ async def cmd_event_reservations(message: Message):
 
         async with aiohttp.ClientSession() as session:
             async with session.get(
-                    f"{API_LINK}/reservation/event/{event_id}/reservations",
+                    f"{API_LINK}:8000/reservation/event/{event_id}/reservations",
                     params={"user_id": user_id, "event_id": event_id}
             ) as response:
                 data = await response.json()

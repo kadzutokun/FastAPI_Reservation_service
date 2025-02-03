@@ -17,7 +17,7 @@ async def cmd_register(message: Message):
 
         async with ClientSession() as session:
             response = await session.post(
-                f"{API_LINK}/users/register",
+                f"{API_LINK}:8000/users/register",
                 json={
                     "telegram_id": telegram_id,
                     "nickname": nickname
@@ -43,7 +43,7 @@ async def cmd_profile(message: Message):
     try:
         user_id = message.from_user.id
         async with ClientSession() as session:
-            response = await session.get(f"{API_LINK}/users/{user_id}")
+            response = await session.get(f"{API_LINK}:8000/users/{user_id}")
             return await handle_api_response(
                 response,
                 message,
